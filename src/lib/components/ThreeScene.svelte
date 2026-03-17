@@ -5,6 +5,7 @@
 	import { robotStore } from '$lib/stores/robotStore';
 	import { cameraStore } from '$lib/stores/cameraStore';
 	import ViewIndicator from '$lib/components/ViewIndicator.svelte';
+	import { fkStore } from '$lib/simulation/simulation';
 
 	let container: HTMLDivElement;
 
@@ -147,6 +148,18 @@
 		gripperRight.castShadow = true;
 		wristYawGroup.add(gripperLeft, gripperRight);
 
+		// ── End-effector marker (driven by FK) ─────────────────
+		const eeMesh = new THREE.Mesh(
+			new THREE.SphereGeometry(0.06, 16, 16),
+			new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 0.4 })
+		);
+		scene.add(eeMesh);
+
+		const unsubFK = fkStore.subscribe((positions) => {
+			const ee = positions[positions.length - 1];
+			if (ee) eeMesh.position.set(ee.x, ee.y, ee.z);
+		});
+
 		// ── Store subscription ─────────────────────────────────
 		const deg = THREE.MathUtils.degToRad;
 
@@ -189,6 +202,7 @@
 
 		return () => {
 			unsub();
+			unsubFK();
 			ro.disconnect();
 			cancelAnimationFrame(animId);
 			renderer.dispose();
