@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import './layout.css';
-	import { locales, localizeHref } from '$lib/data/paraglide/runtime';
+	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
