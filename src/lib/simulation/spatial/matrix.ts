@@ -1,20 +1,16 @@
-import { Tensor } from "./tensor";
-import { Vector3 } from "./vector";
+import { Tensor } from './tensor';
+import { Vector3 } from './vector';
 
-export class Matrix extends Tensor {
+export class Matrix extends Tensor<number[][]> {
   constructor(public rows: number, public cols: number, data: number[][]) {
     super(data, [rows, cols]);
   }
 
-  /**
-   * Multiplies a matrix by another matrix or a Vector3.
-   * Returns the same type as the input 'b'.
-   */
   public static multiply<T extends Matrix | Vector3>(a: Matrix, b: T): T {
     const isVec3 = b instanceof Vector3;
-    
-    const bMatrix = isVec3 
-      ? new Matrix(4, 1, [[b.x], [b.y], [b.z], [1]]) 
+
+    const bMatrix = isVec3
+      ? new Matrix(4, 1, [[b.x], [b.y], [b.z], [1]])
       : (b as Matrix);
 
     if (a.cols !== bMatrix.rows) {
@@ -35,7 +31,7 @@ export class Matrix extends Tensor {
     if (isVec3) {
       return new Vector3(resultData[0][0], resultData[1][0], resultData[2][0]) as T;
     }
-    
+
     return new Matrix(a.rows, bMatrix.cols, resultData) as T;
   }
 }
