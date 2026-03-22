@@ -1,87 +1,86 @@
 <script lang="ts">
-	import { robotStore } from '$lib/stores/robotStore';
+	import { manipulatorStore, triggerMantleCalculation, DEFAULT_MANTLE_PARAMS } from '$lib/stores/simulation';
 
-	const axisColor = (axis: string) =>
-		axis === 'X' ? '#ef4444' : axis === 'Y' ? '#22c55e' : '#3b82f6';
+	const RAD2DEG = 180 / Math.PI;
 
-	const fillPct = (value: number, min: number, max: number) =>
-		((value - min) / (max - min)) * 100;
+	let params = { ...DEFAULT_MANTLE_PARAMS };
 
-	const fmtAngle = (v: number) => (v > 0 ? `+${v}` : `${v}`);
+	$: revolutes = $manipulatorStore.links
+		.map((link, i) => ({ link, i }))
+		.filter(({ link }) => link.type === 'revolute');
 
-	const reset = () =>
-		robotStore.update(($r) => {
-			$r.joints.forEach((j) => j.reset());
-			return { ...$r, gripper: $r.defaultGripper };
-		});
-
-	$: gPct   = $robotStore.gripper * 100;
-	$: gLabel = $robotStore.gripper < 0.15 ? 'Closed' : $robotStore.gripper > 0.85 ? 'Open' : 'Partial';
+	const JOINT_NAMES = ['Base', 'Shoulder', 'Elbow', 'Wrist Roll', 'Wrist Pitch'];
+	const AXIS_COLOR: Record<string, string> = { x: '#ef4444', y: '#22c55e', z: '#3b82f6' };
 </script>
 
 <div class="drawer">
-	<!-- Header -->
 	<div class="header">
-		<span class="title">Joint Controls</span>
-		<button class="reset-btn" onclick={reset} title="Reset all joints">↺</button>
+		<span class="title">Controls</span>
 	</div>
 
-	<!-- Joints -->
-	<div class="section-label">Arm</div>
+	<!-- Joint controls -->
+	<div class="section-label">Joints</div>
 
-	{#each $robotStore.joints as joint, i}
-		{@const color = axisColor(joint.axis)}
-		{@const pct = fillPct(joint.value, joint.min, joint.max)}
-		<div class="card" style="--accent: {color}">
+	{#each revolutes as { link, i }, ri}
+		{@const color = AXIS_COLOR[link.rotationAxis] ?? '#fff'}
+		{@const angleDeg = +(link.angle * RAD2DEG).toFixed(1)}
+		{@const pct = link.angleRange
+			? ((angleDeg - link.angleRange.min) / (link.angleRange.max - link.angleRange.min)) * 100
+			: 50}
+		<div class="card" style="--accent:{color}">
 			<div class="card-header">
-				<div class="joint-id">J{i + 1}</div>
-				<span class="joint-name">{joint.name}</span>
-				<span class="axis-badge" style="color:{color}; background:{color}18">{joint.axis}</span>
-				<span class="joint-val">{fmtAngle(joint.value)}°</span>
+				<div class="joint-id">J{ri + 1}</div>
+				<span class="joint-name">{JOINT_NAMES[ri] ?? `Joint ${ri + 1}`}</span>
+				<span class="axis-badge" style="color:{color};background:{color}18">{link.rotationAxis.toUpperCase()}</span>
+				<span class="joint-val">{angleDeg > 0 ? '+' : ''}{angleDeg}°</span>
 			</div>
-			<div class="track-wrap">
+			{#if link.angleRange}
 				<input
 					type="range"
-					min={joint.min}
-					max={joint.max}
-					step="1"
-					bind:value={$robotStore.joints[i].value}
+					min={link.angleRange.min}
+					max={link.angleRange.max}
+					step="0.5"
+					value={angleDeg}
 					class="slider"
-					style="--pct: {pct}%; --color: {color}"
+					style="--pct:{pct}%;--color:{color}"
+					oninput={(e) => manipulatorStore.setJointAngle(ri, +e.currentTarget.value)}
 				/>
-			</div>
-			<div class="range-labels">
-				<span>{joint.min}°</span>
-				<span>{joint.max}°</span>
-			</div>
+				<div class="range-labels">
+					<span>{link.angleRange.min}°</span>
+					<span>{link.angleRange.max}°</span>
+				</div>
+			{/if}
 		</div>
 	{/each}
 
-	<!-- Gripper -->
-	<div class="section-label" style="margin-top: 8px">End Effector</div>
+	<!-- Mantle settings -->
+	<div class="section-label" style="margin-top:8px">Mantle Settings</div>
 
-	<div class="card" style="--accent: #e05c5c">
-		<div class="card-header">
-			<div class="joint-id" style="background:#e05c5c22; color:#e05c5c">✦</div>
-			<span class="joint-name">Gripper</span>
-			<span class="axis-badge" style="color:#e05c5c; background:#e05c5c18">{gLabel}</span>
+	<div class="card" style="--accent:#4d96ff">
+		<div class="row">
+			<span class="label">Steps / joint</span>
+			<span class="val">{params.stepsPerJoint}</span>
 		</div>
-		<div class="track-wrap">
-			<input
-				type="range"
-				min="0"
-				max="1"
-				step="0.01"
-				bind:value={$robotStore.gripper}
-				class="slider"
-				style="--pct: {gPct}%; --color: #e05c5c"
-			/>
+		<input type="range" min="3" max="20" step="1" bind:value={params.stepsPerJoint} class="slider" style="--pct:{((params.stepsPerJoint-3)/17)*100}%;--color:#4d96ff" />
+
+		<div class="row">
+			<span class="label">Azimuth bins</span>
+			<span class="val">{params.azimuthBins}</span>
 		</div>
-		<div class="range-labels">
-			<span>Closed</span>
-			<span>Open</span>
+		<input type="range" min="12" max="120" step="4" bind:value={params.azimuthBins} class="slider" style="--pct:{((params.azimuthBins-12)/108)*100}%;--color:#4d96ff" />
+
+		<div class="row">
+			<span class="label">Elevation bins</span>
+			<span class="val">{params.elevationBins}</span>
 		</div>
+		<input type="range" min="10" max="100" step="5" bind:value={params.elevationBins} class="slider" style="--pct:{((params.elevationBins-10)/90)*100}%;--color:#4d96ff" />
+
+		<div class="hint">~{((params.stepsPerJoint ** 5) / 1000) | 0}k samples</div>
 	</div>
+
+	<button class="calc-btn" onclick={() => triggerMantleCalculation(params)}>
+		Calculate mantle
+	</button>
 </div>
 
 <style lang="scss">
@@ -102,8 +101,7 @@
 	.header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 8px;
+		margin-bottom: 4px;
 	}
 
 	.title {
@@ -112,22 +110,6 @@
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.5);
-	}
-
-	.reset-btn {
-		font-size: 18px;
-		color: rgba(255, 255, 255, 0.3);
-		background: none;
-		border: none;
-		cursor: pointer;
-		line-height: 1;
-		transition: color 0.15s, transform 0.2s;
-		padding: 2px 4px;
-
-		&:hover {
-			color: rgba(255, 255, 255, 0.8);
-			transform: rotate(-30deg);
-		}
 	}
 
 	.section-label {
@@ -148,12 +130,9 @@
 		padding: 10px 10px 6px;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
-		transition: background 0.15s;
+		gap: 5px;
 
-		&:hover {
-			background: rgba(255, 255, 255, 0.07);
-		}
+		&:hover { background: rgba(255, 255, 255, 0.06); }
 	}
 
 	.card-header {
@@ -185,7 +164,6 @@
 	.axis-badge {
 		font-size: 9px;
 		font-weight: 700;
-		letter-spacing: 0.05em;
 		padding: 1px 6px;
 		border-radius: 99px;
 		flex-shrink: 0;
@@ -195,12 +173,39 @@
 		font-family: 'Courier New', monospace;
 		font-size: 11px;
 		color: rgba(255, 255, 255, 0.6);
-		min-width: 38px;
+		min-width: 42px;
 		text-align: right;
 		flex-shrink: 0;
 	}
 
-	.track-wrap {
+	.row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.label {
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.val {
+		font-family: 'Courier New', monospace;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.hint {
+		font-size: 9px;
+		color: rgba(255, 255, 255, 0.2);
+		text-align: right;
+	}
+
+	.range-labels {
+		display: flex;
+		justify-content: space-between;
+		font-size: 9px;
+		color: rgba(255, 255, 255, 0.2);
 		padding: 0 2px;
 	}
 
@@ -222,19 +227,14 @@
 
 		&::-webkit-slider-thumb {
 			-webkit-appearance: none;
-			appearance: none;
 			width: 14px;
 			height: 14px;
 			border-radius: 50%;
 			background: #fff;
-			box-shadow: 0 0 0 2px var(--color), 0 2px 6px rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 0 2px var(--color), 0 2px 6px rgba(0,0,0,0.5);
 			cursor: pointer;
-			transition: box-shadow 0.15s, transform 0.1s;
-		}
-
-		&::-webkit-slider-thumb:hover {
-			box-shadow: 0 0 0 3px var(--color), 0 2px 8px rgba(0, 0, 0, 0.6);
-			transform: scale(1.15);
+			transition: transform 0.1s;
+			&:hover { transform: scale(1.15); }
 		}
 
 		&::-moz-range-thumb {
@@ -247,11 +247,20 @@
 		}
 	}
 
-	.range-labels {
-		display: flex;
-		justify-content: space-between;
-		font-size: 9px;
-		color: rgba(255, 255, 255, 0.2);
-		padding: 0 2px;
+	.calc-btn {
+		width: 100%;
+		padding: 10px;
+		background: rgba(255, 255, 255, 0.07);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.15s;
+		margin-top: 4px;
+
+		&:hover { background: rgba(255, 255, 255, 0.13); }
+		&:active { background: rgba(255, 255, 255, 0.18); }
 	}
 </style>

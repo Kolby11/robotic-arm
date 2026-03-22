@@ -6,3 +6,6 @@ export const cameraStore = writable({
 	target: new Vector3(0, 1.5, 0),
 	quaternion: new Quaternion()
 });
+
+/** Set to snap the camera to a side-view. ThreeScene consumes and clears it. */
+export const cameraSnapStore = writable<{ position: Vector3; up: Vector3 } | null>(null);

@@ -6,6 +6,14 @@ export class Matrix extends Tensor<number[][]> {
     super(data, [rows, cols]);
   }
 
+  public static identity(n: number): Matrix {
+    return new Matrix(
+      n,
+      n,
+      Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)))
+    );
+  }
+
   public static multiply<T extends Matrix | Vector3>(a: Matrix, b: T): T {
     const isVec3 = b instanceof Vector3;
 

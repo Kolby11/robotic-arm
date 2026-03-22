@@ -1,3 +1,4 @@
+import type { Axis } from '$lib/simulation/spatial/coordinates';
 import { writable } from 'svelte/store';
 
 export class Joint {
@@ -26,7 +27,7 @@ export const robotStore = writable({
 	joints: [
 		new Joint('Base', 'Y', -180, 180, 0),
 		new Joint('Shoulder', 'Z', -90, 90, 0),
-		new Joint('Elbow', 'Z', -135, 45, 30),
+		new Joint('Elbow', 'Z', -135, 45, 0),
 		new Joint('Wrist Roll', 'Y', -180, 180, 0),
 		new Joint('Wrist Pitch', 'Z', -90, 90, 0),
 		new Joint('Wrist Yaw', 'Y', -180, 180, 0)
