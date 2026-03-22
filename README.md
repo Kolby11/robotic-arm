@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-npx sv@0.12.4 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" devtools-json paraglide="languageTags:en, es, de, sk, cz, fr+demo:yes" --install npm robotic-arm
+npx sv@0.12.4 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" devtools-json paraglide="languageTags:en, es, de, sk, cz, fr+demo:yes" --install npm robotic-manipulator
 ```
 
 ## Developing
