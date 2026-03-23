@@ -30,7 +30,7 @@
 		// ── Renderer ───────────────────────────────────────────
 		const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+		renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 		renderer.shadowMap.enabled = true;
 		renderer.setClearColor(0x1f1f1f);
 
@@ -262,13 +262,16 @@
 		});
 
 		// ── Resize ─────────────────────────────────────────────
+		const container = canvas.parentElement!;
 		const ro = new ResizeObserver(() => {
-			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			const w = container.clientWidth;
+			const h = container.clientHeight;
+			camera.aspect = w / h;
 			camera.updateProjectionMatrix();
-			renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+			renderer.setSize(w, h, false);
 			renderer.render(scene, camera);
 		});
-		ro.observe(canvas);
+		ro.observe(container);
 
 		// ── Animate ────────────────────────────────────────────
 		const animate = () => {
