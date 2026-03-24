@@ -8,7 +8,10 @@
 	// Express a world-space vector in camera local space (rotate by conjugate of q)
 	function toCamera(v: Vector3, q: Quaternion): Vector3 {
 		const [vx, vy, vz] = v;
-		const qx = -q.x, qy = -q.y, qz = -q.z, qw = q.w;
+		const qx = -q.x,
+			qy = -q.y,
+			qz = -q.z,
+			qw = q.w;
 		const tx = 2 * (qy * vz - qz * vy);
 		const ty = 2 * (qz * vx - qx * vz);
 		const tz = 2 * (qx * vy - qy * vx);
@@ -21,12 +24,48 @@
 
 	// World-space up for each view direction (Z-up system)
 	const AXES = [
-		{ label: 'X',  dir: new Vector3(1,0,0),  up: new Vector3(0,0,1), color: '#ef4444', neg: false },
-		{ label: 'Y',  dir: new Vector3(0,1,0),  up: new Vector3(0,0,1), color: '#22c55e', neg: false },
-		{ label: 'Z',  dir: new Vector3(0,0,1),  up: new Vector3(0,1,0), color: '#3b82f6', neg: false },
-		{ label: '-X', dir: new Vector3(-1,0,0), up: new Vector3(0,0,1), color: '#ef4444', neg: true  },
-		{ label: '-Y', dir: new Vector3(0,-1,0), up: new Vector3(0,0,1), color: '#22c55e', neg: true  },
-		{ label: '-Z', dir: new Vector3(0,0,-1), up: new Vector3(0,1,0), color: '#3b82f6', neg: true  },
+		{
+			label: 'X',
+			dir: new Vector3(1, 0, 0),
+			up: new Vector3(0, 0, 1),
+			color: '#ef4444',
+			neg: false
+		},
+		{
+			label: 'Y',
+			dir: new Vector3(0, 1, 0),
+			up: new Vector3(0, 0, 1),
+			color: '#22c55e',
+			neg: false
+		},
+		{
+			label: 'Z',
+			dir: new Vector3(0, 0, 1),
+			up: new Vector3(0, 1, 0),
+			color: '#3b82f6',
+			neg: false
+		},
+		{
+			label: '-X',
+			dir: new Vector3(-1, 0, 0),
+			up: new Vector3(0, 0, 1),
+			color: '#ef4444',
+			neg: true
+		},
+		{
+			label: '-Y',
+			dir: new Vector3(0, -1, 0),
+			up: new Vector3(0, 0, 1),
+			color: '#22c55e',
+			neg: true
+		},
+		{
+			label: '-Z',
+			dir: new Vector3(0, 0, -1),
+			up: new Vector3(0, 1, 0),
+			color: '#3b82f6',
+			neg: true
+		}
 	];
 
 	onMount(() => {
@@ -36,11 +75,14 @@
 		const ctx = canvas.getContext('2d')!;
 
 		// Track last projected positions for click hit-testing
-		let lastProjected: Array<typeof AXES[0] & { px: number; py: number; depth: number }> = [];
-		let lastCamState = { position: new Vector3(6,-6,4), target: new Vector3(0,0,1.5) };
+		let lastProjected: Array<(typeof AXES)[0] & { px: number; py: number; depth: number }> = [];
+		let lastCamState = { position: new Vector3(6, -6, 4), target: new Vector3(0, 0, 1.5) };
 
 		const unsub = cameraStore.subscribe(($c) => {
-			lastCamState = { position: $c.position.clone(), target: $c.target?.clone() ?? new Vector3(0,0,1.5) };
+			lastCamState = {
+				position: $c.position.clone(),
+				target: $c.target?.clone() ?? new Vector3(0, 0, 1.5)
+			};
 			ctx.clearRect(0, 0, SIZE, SIZE);
 
 			// Background circle
@@ -103,7 +145,10 @@
 			let bestD = Infinity;
 			for (const ax of lastProjected) {
 				const d = Math.hypot(mx - ax.px, my - ax.py);
-				if (d < bestD) { bestD = d; best = ax; }
+				if (d < bestD) {
+					bestD = d;
+					best = ax;
+				}
 			}
 
 			if (!best || bestD > 16) return;
@@ -123,5 +168,6 @@
 </script>
 
 <div class="absolute top-4 right-4 cursor-pointer">
-	<canvas bind:this={canvas} width="100" height="100" title="Click an axis to snap to that view"></canvas>
+	<canvas bind:this={canvas} width="100" height="100" title="Click an axis to snap to that view"
+	></canvas>
 </div>

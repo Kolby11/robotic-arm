@@ -47,11 +47,14 @@
 	$: elPct = ((params.elevationBins - 10) / 90) * 100;
 </script>
 
-<div class="flex h-full w-60 flex-shrink-0 flex-col gap-1.5 overflow-y-auto border-r border-black/8 px-3 py-4 [backdrop-filter:blur(20px)] bg-[rgba(245,243,240,0.92)] shadow-[4px_0_24px_rgba(0,0,0,0.08)] dark:border-white/8 dark:bg-[rgba(22,22,30,0.96)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.3)]">
-
+<div
+	class="flex h-full w-60 shrink-0 flex-col gap-1.5 overflow-y-auto border-r border-black/8 bg-[rgba(245,243,240,0.92)] px-3 py-4 shadow-[4px_0_24px_rgba(0,0,0,0.08)] [backdrop-filter:blur(20px)] dark:border-white/8 dark:bg-[rgba(22,22,30,0.96)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.3)]"
+>
 	<!-- Header -->
 	<div class="mb-1 flex items-center">
-		<span class="flex-1 text-[11px] font-bold uppercase tracking-[0.12em] text-black/40 dark:text-white/40">
+		<span
+			class="flex-1 text-[11px] font-bold tracking-[0.12em] text-black/40 uppercase dark:text-white/40"
+		>
 			Controls
 		</span>
 		<button
@@ -64,11 +67,13 @@
 	</div>
 
 	<!-- Joints -->
-	<div class="mb-0.5 px-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35 dark:text-white/35">
+	<div
+		class="mb-0.5 px-1 text-[9px] font-semibold tracking-[0.14em] text-black/35 uppercase dark:text-white/35"
+	>
 		Joints
 	</div>
 
-	{#each revolutes as { link, i }, ri}
+	{#each revolutes as { link, i }, ri (i)}
 		{@const color = AXIS_COLOR[link.rotationAxis] ?? '#fff'}
 		{@const angleDeg = +(link.angle * RAD2DEG).toFixed(1)}
 		{@const pct = link.angleRange
@@ -76,23 +81,29 @@
 			: 50}
 
 		<div
-			class="flex flex-col gap-1.5 rounded-lg border border-black/7 px-2.5 pb-1.5 pt-2.5 bg-white/70 transition-colors hover:bg-white/90 dark:border-white/7 dark:bg-[rgba(35,35,48,0.8)] dark:hover:bg-[rgba(42,42,58,0.95)]"
+			class="flex flex-col gap-1.5 rounded-lg border border-black/7 bg-white/70 px-2.5 pt-2.5 pb-1.5 transition-colors hover:bg-white/90 dark:border-white/7 dark:bg-[rgba(35,35,48,0.8)] dark:hover:bg-[rgba(42,42,58,0.95)]"
 			style="border-left: 2px solid {color}"
 		>
 			<div class="flex items-center gap-1.5">
-				<div class="flex-shrink-0 rounded bg-black/6 px-1.5 py-0.5 text-[9px] font-bold text-black/45 dark:bg-white/8 dark:text-white/45">
+				<div
+					class="shrink-0 rounded bg-black/6 px-1.5 py-0.5 text-[9px] font-bold text-black/45 dark:bg-white/8 dark:text-white/45"
+				>
 					J{ri + 1}
 				</div>
-				<span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-black/80 dark:text-white/85">
+				<span
+					class="min-w-0 flex-1 overflow-hidden text-xs font-medium text-ellipsis whitespace-nowrap text-black/80 dark:text-white/85"
+				>
 					{JOINT_NAMES[ri] ?? `Joint ${ri + 1}`}
 				</span>
 				<span
-					class="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
+					class="shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
 					style="color:{color}; background:{color}18"
 				>
 					{link.rotationAxis.toUpperCase()}
 				</span>
-				<span class="min-w-[42px] flex-shrink-0 text-right font-mono text-[11px] text-black/55 dark:text-white/50">
+				<span
+					class="min-w-10.5 shrink-0 text-right font-mono text-[11px] text-black/55 dark:text-white/50"
+				>
 					{angleDeg > 0 ? '+' : ''}{angleDeg}°
 				</span>
 			</div>
@@ -117,31 +128,63 @@
 	{/each}
 
 	<!-- Mantle settings -->
-	<div class="mb-0.5 mt-2 px-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35 dark:text-white/35">
+	<div
+		class="mt-2 mb-0.5 px-1 text-[9px] font-semibold tracking-[0.14em] text-black/35 uppercase dark:text-white/35"
+	>
 		Mantle Settings
 	</div>
 
 	<div
-		class="flex flex-col gap-1.5 rounded-lg border border-black/7 px-2.5 pb-1.5 pt-2.5 bg-white/70 transition-colors hover:bg-white/90 dark:border-white/7 dark:bg-[rgba(35,35,48,0.8)] dark:hover:bg-[rgba(42,42,58,0.95)]"
+		class="flex flex-col gap-1.5 rounded-lg border border-black/7 bg-white/70 px-2.5 pt-2.5 pb-1.5 transition-colors hover:bg-white/90 dark:border-white/7 dark:bg-[rgba(35,35,48,0.8)] dark:hover:bg-[rgba(42,42,58,0.95)]"
 		style="border-left: 2px solid #4d96ff"
 	>
 		<div class="flex items-center justify-between">
 			<span class="text-[11px] text-black/55 dark:text-white/50">Steps / joint</span>
-			<span class="font-mono text-[11px] text-black/75 dark:text-white/80">{params.stepsPerJoint}</span>
+			<span class="font-mono text-[11px] text-black/75 dark:text-white/80"
+				>{params.stepsPerJoint}</span
+			>
 		</div>
-		<input type="range" min="3" max="20" step="1" bind:value={params.stepsPerJoint} class={sliderClass} style={sliderStyle('#4d96ff', spjPct)} />
+		<input
+			type="range"
+			min="3"
+			max="20"
+			step="1"
+			bind:value={params.stepsPerJoint}
+			class={sliderClass}
+			style={sliderStyle('#4d96ff', spjPct)}
+		/>
 
 		<div class="flex items-center justify-between">
 			<span class="text-[11px] text-black/55 dark:text-white/50">Azimuth bins</span>
-			<span class="font-mono text-[11px] text-black/75 dark:text-white/80">{params.azimuthBins}</span>
+			<span class="font-mono text-[11px] text-black/75 dark:text-white/80"
+				>{params.azimuthBins}</span
+			>
 		</div>
-		<input type="range" min="12" max="120" step="4" bind:value={params.azimuthBins} class={sliderClass} style={sliderStyle('#4d96ff', azPct)} />
+		<input
+			type="range"
+			min="12"
+			max="120"
+			step="4"
+			bind:value={params.azimuthBins}
+			class={sliderClass}
+			style={sliderStyle('#4d96ff', azPct)}
+		/>
 
 		<div class="flex items-center justify-between">
 			<span class="text-[11px] text-black/55 dark:text-white/50">Elevation bins</span>
-			<span class="font-mono text-[11px] text-black/75 dark:text-white/80">{params.elevationBins}</span>
+			<span class="font-mono text-[11px] text-black/75 dark:text-white/80"
+				>{params.elevationBins}</span
+			>
 		</div>
-		<input type="range" min="10" max="100" step="5" bind:value={params.elevationBins} class={sliderClass} style={sliderStyle('#4d96ff', elPct)} />
+		<input
+			type="range"
+			min="10"
+			max="100"
+			step="5"
+			bind:value={params.elevationBins}
+			class={sliderClass}
+			style={sliderStyle('#4d96ff', elPct)}
+		/>
 
 		<div class="text-right text-[9px] text-black/30 dark:text-white/30">
 			~{(params.stepsPerJoint ** 5 / 1000) | 0}k samples

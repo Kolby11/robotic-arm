@@ -101,7 +101,7 @@ export function calculateManipulatorMantle(
 			if (ring.length < 2) continue;
 			ring.sort((a, b) => a.ai - b.ai);
 			const pts = ring.map((r) => r.point);
-			pts.push(pts[0]); // close the ring
+			pts.push(pts[0]);
 			rings.push(pts);
 		}
 		return rings;
