@@ -1,42 +1,28 @@
-# sv
+# Robotic manipulator
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Interactive 3d simulation of robotic manipulator built with SvelteKit, Three.js and a custom kinematic library.
 
-## Creating a project
+Project for the university robotics subject, demonstrating my knowledge of spacial transformation using matrixes.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Setup
 
-```sh
-# create a new project
-npx sv create my-app
+- [Node.js](https://nodejs.org/) version **20 or higher**
+- npm (part of Node.js)
+
+---
+
+## Starting the project
+
+### 1. Dependencies installation
+
+```bash
+npm install
 ```
 
-To recreate this project with the same configuration:
+### 2. Startup of development server
 
-```sh
-# recreate this project
-npx sv@0.12.4 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" devtools-json paraglide="languageTags:en, es, de, sk, cz, fr+demo:yes" --install npm robotic-manipulator
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Webapplication will be available on [http://localhost:5173](http://localhost:5173).

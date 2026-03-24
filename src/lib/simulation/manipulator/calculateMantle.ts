@@ -4,9 +4,9 @@ import { Vector3 } from '../spatial/vector';
 const DEG2RAD = Math.PI / 180;
 
 export interface MantleParams {
-	stepsPerJoint: number; // samples per joint  (e.g. 10 → 10^5 = 100 000)
-	azimuthBins: number; // horizontal slices around the vertical axis
-	elevationBins: number; // vertical slices
+	stepsPerJoint: number;
+	azimuthBins: number;
+	elevationBins: number;
 }
 
 export const DEFAULT_MANTLE_PARAMS: MantleParams = {
@@ -55,9 +55,8 @@ export function calculateManipulatorMantle(
 			const ee = manipulator.links[manipulator.links.length - 1].endVector;
 			const { x, y, z } = ee;
 			const r = Math.sqrt(x * x + y * y + z * z);
-			if (r < 1e-6 || z < 0) return;
+			if (r < 1e-6) return;
 
-			// Z-up: azimuth in XY plane, elevation from XY plane toward Z
 			const azimuth = Math.atan2(y, x);
 			const elevation = Math.asin(Math.max(-1, Math.min(1, z / r)));
 
